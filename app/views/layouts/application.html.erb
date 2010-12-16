@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FaceGraph.ME - <%=@node_type.titleize%><% unless @friend_name.blank? %> with <%=@friend_name%><%end%></title>
+  <%= stylesheet_link_tag 'jquery-ui' %>
+  <%= javascript_include_tag 'jquery' %>
+  <%= javascript_include_tag 'jquery-ui' %>
+  <%= csrf_meta_tag %>
+  <%=render "/layouts/application_js_jquery_ext"%>
+  <%=render "/layouts/application_js"%>
+  <%=render "/layouts/application_css"%>
+
+<script src="http://connect.facebook.net/en_US/all.js"></script>
+   <meta property="og:title" content="FaceGraph.ME - <%=@node_type.titleize%><% unless @friend_name.blank? %> with <%=@friend_name%><%end%>" />
+      <meta property="og:type" content="facegraph_me:<%=@node_type%>" />
+   <meta property="og:image" content="http://<%=request.domain%><%=image_path "common/logo-without-text.png"%>" />
+  <meta property="og:url" content="http://<%=request.domain%><%unless request.port.to_s == "80"%>:<%=request.port%><%end%><%=request.request_uri.gsub(/\?.*/, "")%>" />
+   <meta property="og:site_name" content="FaceGraph.ME" />
+  <meta property="fb:app_id" content="<%=@facebook_app_id%>"/>
+  <meta property="og:description" content="FaceGraph.ME is a fun way to visualize your social graph on Facebook. You can check out places you have been to with a friend, graph out real-time visualizations of common friends (coming soon), and much more!" />
+</head>
+<body>
+
+<div class="wrapper">
+
+  <div class="header" id="header"></div>
+<div class="logo"><a href="http://<%=request.host%><%unless request.port.to_s == "80"%>:<%=request.port%><%end%>" id="logo-home">&nbsp;</a></div>
+
+<%= render :partial =>"/layouts/navigation"%>
+<%= render :partial =>"/friend_list/friend_list"%>
+
+<div id="main_content">
+
+<%= yield %>
+    <% if @render_widget %>
+<div class="ui-block-widget">
+  <div class="ui-block-left">
+    </div>
+<div class="ui-block-right">
+      <script type="text/javascript">
+        $('#pagination_container').hide();
+      </script>
+
+  <div class="ui-widget" id="pagination_container">
+			<div class="ui-state-highlight ui-corner-all">
+				<p ><span style="float: left; margin-right: .3em;"></span>
+				<strong>Looking for more? </strong><span id="pagination"></span></p>
+			</div>
+		</div>
+<div id="pagination_spinner"></div>
+
+      <script type="text/javascript">
+        $('#pagination_container').hide();
+      </script>
+  <div class="social-widget-fb-comment">
+    <fb:comments numposts="10" width="510" publish_feed="true"></fb:comments>
+  </div>
+
+</div>
+      </div>
+  <%end%>
+
+<div class="ui-helper-clearfix"></div>
+</div>
+  <div class="footer">
+    <div class="footer-text">
+    <p class="footer-nav">
+      <a href="http://<%=request.domain%><%unless request.port.to_s == "80"%>:<%=request.port%><%end%>">HOME</a> | <a href="https://getsatisfaction.com/facegraphme">GET SATISFACTION</a> | <a href="http://ronaldwan.com">BLOG</a> | <a href="https://github.com/ronaldwan/facegraphme">DEVELOPERS</a> | <a href="http://www.facebook.com/apps/application.php?id=133668973356228">FACEBOOK</a> | <a href="http://twitter.com/FaceGraphME">TWITTER</a> | <a href="mailto:admin@facegraph.me">CONTACT US</a>
+    </p>
+    <p class="copyright">COPYRIGHT <%=Date.today.year%> FACEGRAPH.  ALL RIGHTS RESERVED</p>
+      </div>
+  </div>
+
+  <div id="fb-root"></div>
+  <script>
+    loadFacebookEnvironment();
+  </script>
+
+
+
+
+
+</div>
+
+
+</body>
+</html>
+

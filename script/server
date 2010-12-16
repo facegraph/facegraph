@@ -1,0 +1,4 @@
+#!/bin/sh
+
+memcached -vv &
+rails server

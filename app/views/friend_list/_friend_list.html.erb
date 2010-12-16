@@ -1,0 +1,35 @@
+<%= render :partial => "/friend_list/css" %>
+
+<div style="clear:both"></div>
+
+<div id="friend-wrapper" class="friend-wrapper">
+  <div class="friend-list-loading" id="friend-list-loading">
+    <div class="friend-list-character"></div>
+    <span id="friend-list-character-displaying" class="friend-list-character-displaying"></span>
+  </div>
+<div id="fb-login-canvas">
+  <div id="login-image"></div>
+
+  <div id="login-btn"><fb:login-button autologoutlink="false" onlogin="loginComplete();" perms="user_checkins,friends_checkins,read_stream"></fb:login-button>
+        &nbsp;&nbsp;to Graph Me and My Friends Now!</div>
+    </div>
+  <div id="friend-container" class="friend-container">
+
+    <div class="friend-list" id="friend-list" >
+    </div>
+
+    <div id="friend-scroller" class="friend-scroller"></div>
+  </div>
+
+  <div id="friend-selector" class="friend-selector">
+    <div class="friend-letters">
+      <%for letter in ('A' .. 'Z').to_a%>
+          <a href="#__" onclick="friendlist.getFriend('<%=letter%>')"><%=letter%></a>
+      <%end%>
+    </div>
+  </div>
+
+</div>
+
+
+<%= render :partial => "/friend_list/js" %>

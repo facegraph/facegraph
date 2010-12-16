@@ -1,0 +1,151 @@
+<% checkin_time = DateTime.parse(checkin['created_time']).new_offset Rational(params[:timezone].to_i,24)  %>
+
+<div id="checkin_<%=checkin['id']%>" class="ui-block-content ui-block-two-col  ui-corner-all">
+<div class="ui-block-titlebar">
+  <div class="ui-block-titlebar-background"></div>
+    <div class="ui-block-left">
+      <div style="float:right;">
+      <img src="http://maps.google.com/maps/api/staticmap?center=<%= checkin['place']['location']['latitude']%>,<%= checkin['place']['location']['longitude']%>&zoom=12&size=100x100&format=png&sensor=false&markers=<%= checkin['place']['location']['latitude']%>,<%= checkin['place']['location']['longitude']%>"
+          onclick="loadPanorama('<%= checkin['place']['location']['latitude']%>','<%= checkin['place']['location']['longitude']%>')"/>
+</div>
+    </div>
+    <div class="ui-block-right">
+    <h1 class="ui-block-title"><a href="#__" onclick="loadPanorama('<%= checkin['place']['location']['latitude']%>','<%= checkin['place']['location']['longitude']%>')"><%=checkin['place']['name']%></a></h1>
+
+
+
+
+
+            <%= checkin['place']['location']['street']%><br/>
+            <%= checkin['place']['location']['city']%> <%= checkin['place']['location']['state']%><br/>
+            <%= checkin['place']['location']['country']%> <%= checkin['place']['location']['zip']%><br/><br/>
+
+        <a href="http://maps.google.com/maps?f=q&source=s_q&hl=en&geocode=&sll=<%= checkin['place']['location']['latitude']%>,<%= checkin['place']['location']['longitude']%>&q=<%= checkin['place']['location']['latitude']%>,<%= checkin['place']['location']['longitude']%>&z=12">
+        Latitude:  <%= checkin['place']['location']['latitude']%>
+        Longitude:  <%= checkin['place']['location']['longitude']%></a>
+          </div>
+</div>
+
+
+
+
+
+
+
+
+<div class="ui-block-main">
+<div class="ui-block-left">
+  </div>
+
+  <div class="ui-block-right">
+<div class="checkin-author-block">
+    <div class="profile-pic"><fb:profile-pic uid="<%=checkin['from']['id']%>" linked="false" size="square" ></fb:profile-pic></div>
+
+
+  <div class="checkin-content">
+    <h2><a href="#__" onclick="facebookNodeUrl('<%=checkin['from']['id']%>')"><%=checkin['from']['name']%></a> was here <%=(DateTime.now.to_date - checkin_time.to_date).abs.to_i %> days ago</h2>
+
+
+    <p class="checkin-message">
+    <% if checkin['message'] %>
+        <% escaped_message = CGI::escapeHTML(simple_format(checkin['message'])) %>
+        "<%= CGI::unescapeHTML(escaped_message[9..escaped_message.length-11]) %>"
+    <% else %>
+        No message
+    <% end %>
+        </p>
+
+
+<span class="metadata">
+    <%=checkin_time.strftime("%B %d %Y at %I:%M%p")%>
+    via <a href="#__" onclick="facebookNodeUrl('<%=checkin['application']['id']%>')"><%= checkin['application']['name'] %></a>
+</span>
+    </div>
+</div>
+
+
+
+<div class="ui-helper-clearfix"></div>
+   
+    <%if checkin['tags']%>
+       
+        <div class="tag-block">
+          <h2>Tags</h2>
+    <div class="fb_tagged_user">
+        <div><%for tagged_user in checkin['tags']['data']%>
+              <div class="fb_profile_pic">
+           <fb:profile-pic uid="<%=tagged_user['id']%>" linked="false" size="square" height="30px" width="30px"></fb:profile-pic></div>
+        <%end%>
+        </div>
+
+        <div class="fb_tagged_name_list">
+          <p>
+        <%checkin['tags']['data'].each_with_index do |tagged_user, index|%>
+            <a href="#__" onclick="facebookNodeUrl('<%=tagged_user['id']%>')"><%=tagged_user['name']%></a><%unless index==checkin['tags']['data'].count-1%>, <%end%>
+        <%end%>  tagged along
+            </p>
+        </div>
+    </div>
+        </div>
+         <div class="ui-helper-clearfix"></div>
+    <%end%>
+
+
+
+    <div class="tag-block">
+          <h2>Comments and likes</h2>
+
+        <%if checkin['likes']%>
+            <div class="fb_likes">
+              <div>
+          <% checkin['likes']['data'].each_with_index do |like, index| %>
+            <fb:profile-pic uid="<%=like['id']%>" linked="true" size="square" height="30px" width="30px"></fb:profile-pic>
+
+          <%end%>
+              </div>
+
+<div>
+            <% checkin['likes']['data'].each_with_index do |like, index| %>
+                <a href="#__" onclick="facebookNodeUrl('<%=like['id']%>')"><%= like['name'] %></a><%unless index==checkin['likes']['data'].count-1%>, <%end%>
+            <% end %> likes this
+          </div>
+          </div>
+        <% end %>
+
+
+      
+    <%if checkin['comments']%>
+        <%for comment in checkin['comments']['data']%>
+         <div class="fb_comment_base">
+            <div class="fb_comment_profile_pic">
+            <fb:profile-pic uid="<%=comment['from']['id']%>" linked="true" size="square"></fb:profile-pic>
+            </div>
+            <div class="fb_comment_content">
+                <span>
+                    <a class="fb_comment_name" href="#__" onclick="facebookNodeUrl('<%=comment['from']['id']%>')"><%=comment['from']['name']%></a>
+                    <% escaped_comment = CGI::escapeHTML(simple_format(comment['message'])) %>
+
+                    <%= CGI::unescapeHTML(escaped_comment[9..escaped_comment.length-11]) %>
+                </span>
+
+                <p class="metadata">
+                    <% comment_time = DateTime.parse(comment['created_time']).new_offset Rational(5.to_i,24) %>
+                    <%=comment_time.strftime("%A, %B %d %Y at %I:%M%p") %> [<%=(DateTime.now.to_date - comment_time.to_date).abs.to_i %> days ago]
+                </p>
+            </div>
+            </div>
+        <%end%>
+    <%else%>
+     <div class="fb_comment_base">
+        No comment
+     </div>
+    <%end%>
+</div>
+
+
+    </div>
+  </div>
+
+
+<div class="ui-helper-clearfix"></div>
+  </div>

@@ -1,0 +1,13 @@
+Host:
+  domain:     facegraph.me
+
+FacebookApp:
+  app_id:     133668973356228
+  api_key:    86991581b160d5910f2c0cb4e5105bfa
+  app_secret: 3b75994de7f0ba7531983218b35b414d
+
+GoogleMaps:
+  api_key:    ABQIAAAAjAE2LJkYFQi_sFY7yY_WiBS7f21AVOEcTFxHfEJaaJGozKSXORTVUtd2duKBmzdNwwud_z9kr5U77A
+
+Analytics:
+  domain:     http://facegraph-analytics.heroku.com

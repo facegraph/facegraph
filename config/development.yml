@@ -1,0 +1,13 @@
+Host:
+  domain:     ronaldwan.com:82
+
+FacebookApp:
+  app_id:     174195472605066
+  api_key:    249f81fb6a3fc6401584498c48afeb19
+  app_secret: 1e6727a1b2521f808c7d94a641876102
+
+GoogleMaps:
+  api_key:    ABQIAAAAjAE2LJkYFQi_sFY7yY_WiBS7f21AVOEcTFxHfEJaaJGozKSXORTVUtd2duKBmzdNwwud_z9kr5U77A
+
+Analytics:
+  domain:     http://ronaldwan.com:82

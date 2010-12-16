@@ -1,0 +1,163 @@
+<style type="text/css">
+    .friend-node-container{
+        position:relative;
+        float:left;
+        margin-left: 5px;
+        margin-right: 5px;
+        max-width:104px;
+        overflow:hidden;
+        color:#fff;
+        height:164px;
+    }
+
+    .friend-node-background{
+        position:relative;
+        border: 2px solid #eeeded;
+        background-color:#cccccc;
+        ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+	filter: alpha(opacity=50);
+        opacity: 0.5;
+        width:100px;
+        height:156px;
+    }
+
+    .friend-node-content{
+        position:relative;
+        top:-156px;
+    }
+
+    .friend-list-node-name{
+        -webkit-transform: rotate(-90deg);
+        -moz-transform: rotate(-90deg);
+        font-size: 18px;
+        height: 22px;
+        position: absolute;
+        top: 55px;
+        width: 160px;
+        left:0px;
+        overflow:hidden;
+    }
+
+    .friend-list-character{
+        position:absolute;
+        top:100px;
+        ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+	filter: alpha(opacity=20);
+        opacity: 0.2;
+        width:720px;
+        height:40px;
+        background-color:#fff;
+    }
+
+    .friend-container{
+        overflow:hidden;
+        position:relative;
+        width:720px;
+        height:180px;
+        margin-bottom:2px;
+    }
+
+    .friend-list{
+        min-width:700px;
+        padding:10px;
+        position:relative;
+    }
+
+    .friend-selector{
+        width:720px;
+        height:24px;
+        background-color:#C00;
+    }
+
+    .friend-list-character-displaying{
+        position:absolute;
+        color:#EEE;
+        top:105px;
+        font-size:12px;
+        float:right;
+        left:570px;
+    }
+
+    .friend-list-character-displaying-current{
+        font-size:30px;
+    }
+
+    .friend-selector a{
+        color:#ffffff;
+        padding:8px;
+        text-decoration: none;
+        font-weight:bold;
+    }
+
+    .friend-letters{
+        text-align:center;
+        padding-top:6px;
+    }
+
+    .friend-list-node-profile-pic{
+        left: 5px;
+        margin-top: 48px;
+        position: absolute;
+        z-index:1;
+    }
+
+    .friend-scroller{
+        position:absolute;
+        width:720px;
+        top:0;
+        height:180px;
+        z-index:99;
+    }
+
+    .friend-list-error-message{
+        color:#fff;
+        margin-top:70px;
+        font-size: 15px;
+        text-align:center;
+    }
+
+    .friend-wrapper{
+        margin-top:20px;
+        padding-bottom:20px;
+        min-height:180px;
+    <%if @layout_column == 2%>
+        background-image:url('<%=image_path "common/col-2-bg.png"%>');
+    <%end%>
+    }
+
+    .friend-list-loading{
+        width:718px;
+        height:178px;
+        position:absolute;
+
+        background-position:center center;
+        background-repeat:no-repeat;
+        background-color:#C00;
+        border: 1px solid #C00;
+    }
+
+    .friend-info{
+        color:#ffffff;
+        padding-top:6px;
+        text-decoration: none;
+        font-weight:bold;
+        background-color:#C00;
+        text-align:center;
+        height:18px;
+    }
+</style>
+
+<!--[if IE]>
+<style type="text/css">
+    .friend-list-node-name{
+        -ms-writing-mode:bt-lr;
+        writing-mode:bt-lr;
+        height: 148px;
+        position: absolute;
+        top: 0px;
+        width: 22px;
+        left:70px;
+        text-align:right;
+    }
+</style>
+<![endif]-->

@@ -1,0 +1,287 @@
+<style type="text/css">
+    /*demo page css*/
+    p{margin:0px;}
+    body{ font: 62.5% "Arial", "Helvetica", "Trebuchet MS", sans-serif; /*margin: 50px;*/ text-align : center ; background-color: #EEE; padding: 20px; color:#444;}
+    .demoHeaders { margin-top: 2em; }
+    #dialog_link {padding: .4em 1em .4em 20px;text-decoration: none;position: relative;}
+    #dialog_link span.ui-icon {margin: 0 5px 0 0;position: absolute;left: .2em;top: 50%;margin-top: -8px;}
+    ul#icons {margin: 0; padding: 0;}
+    ul#icons li {margin: 2px; position: relative; padding: 4px 0; cursor: pointer; float: left;  list-style: none;}
+    ul#icons span.ui-icon {float: left; margin: 0 4px;}
+
+    #main_content{ width:720px; max-width:720px; min-width:720px;
+    <%if @layout_column == 2%>
+        background-image:url('<%=image_path "common/col-2-bg.png"%>');
+    <%end%>
+    }
+
+    #pagination_spinner{
+        background-image:url('<%=image_path "common/ajax-loader-facebook.gif"%>');
+        background-repeat:no-repeat;
+        background-position:center;
+        min-width:32px;
+        min-height:32px;
+        display:none;
+    }
+
+    .ui-widget-content { padding: 0.5em; }
+    .ui-widget-content .ui-widget-header h3 { text-align: center; margin: 0; }
+
+    .wrapper {
+        text-align : left ;
+        margin-left : auto ;
+        margin-right : auto ;
+        width:720px;
+        border: 4px solid #DDD;
+        padding: 20px;
+        background-color:#fff;
+    }
+
+    .logo{
+        background-image:url('<%=image_path "common/logo-with-text.png"%>');
+        background-position:bottom left;
+        background-repeat:no-repeat;
+        width:294px;
+        height:40px;
+        float:left;
+    }
+
+    .logo #logo-home{
+        padding-left: 300px;
+        padding-top: 35px;
+        position: relative;
+        text-indent: -9999px;
+        top: 30px;
+    }
+
+    a{
+        text-decoration:none;
+        color:#C00;
+    }
+
+    .ui-block-main{
+        clear:both;
+        float:left;
+    }
+
+    .ui-block-content .ui-block-titlebar{
+        color:#fff;
+    }
+
+    .ui-block-titlebar .ui-block-titlebar-background{
+        width:720px;
+        height:9999px;
+        position:absolute;
+    }
+
+    .ui-block-content .ui-block-titlebar-background{
+
+
+        background: #0071b9;
+        ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+	filter: alpha(opacity=70);
+        opacity:0.7;
+    }
+
+    .ui-block-info .ui-block-titlebar-background{
+        background-color: #C00;
+        ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+	filter: alpha(opacity=70);
+        opacity:0.7;
+    }
+
+    .ui-block-titlebar{
+        clear:both;
+        position:relative;
+        height:115px;
+        overflow:hidden;
+    }
+
+    .ui-block-titlebar h1{
+        margin:0px;
+        color:#fff;
+    }
+
+    .ui-block-titlebar a{
+        color:#fff;
+    }
+
+    .ui-block-titlebar a:hover{
+        color:#fff;
+    }
+
+    .ui-block-titlebar h1 a:visited{
+        color:#fff;
+    }
+
+    .ui-block-titlebar ul{
+        color:#fff;
+    }
+
+    .ui-block-left{
+        min-width:184px;
+        max-width:184px;
+        float:left;
+        padding:8px;
+        position:relative;
+    }
+
+    .ui-block-right{
+        min-width:504px;
+        max-width:504px;
+        float:right;
+        padding:8px;
+        position:relative;
+    }
+
+    .metadata{
+        color:#888;
+        margin-top:3px;
+    }
+
+    .tag-block{
+        flaot:left;
+    }
+
+    .tag-block h2{
+        border-bottom: 5px solid #999;
+    }
+
+    .comment-block h2{
+        border-bottom: 5px solid #999;
+    }
+
+    .fb_likes{
+        padding:5px;
+        margin-bottom:20px;
+        border:1px solid #CCC;
+    }
+
+    .fb_comment_base{
+        clear:both;
+        margin-top:10px;
+        float:left;
+    }
+
+    .fb_comment_profile_pic{
+        float:left;
+    }
+
+    .fb_comment_name{
+        font-weight:bold;
+    }
+
+    .fb_comment_content{
+        margin-left:60px;
+    }
+
+    .ui-block-widget{
+        position:relative;
+    }
+
+    .ui-block-widget{
+        margin-top:50px;
+    }
+
+    .ui-block-widget .ui-state-highlight{
+        padding:10px;
+    }
+
+    .ui-block-widget .social-widget-fb-comment{
+        margin-top:10px;
+    }
+
+    .fb_tagged_user .fb_profile_pic{
+        float:left;
+        margin-right:2px;
+    }
+
+    .fb_tagged_user .fb_tagged_name_list{
+        clear: both;
+    }
+
+
+
+    #fb-login-canvas{
+        position:absolute;
+        display:none;
+    }
+
+    #fb-login-canvas #login-image{
+        background-image: url('<%=image_path "common/logo-without-text.png"%>');
+        background-repeat:no-repeat;
+        width:100px;
+        height:100px;
+        position:absolute;
+        margin-top:35px;
+        margin-left:10px;
+        ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+	filter: alpha(opacity=40);
+        opacity:0.4;
+    }
+
+    #fb-login-canvas #login-btn{
+        text-align:right;
+        margin-right:20px;
+        color: white;
+        font-size: 1.2em;
+        font-weight: bold;
+        margin-top:110px;
+        margin-left:420px;
+    }
+
+    .footer{
+        margin-top:20px;
+        background-color:#EEEEEE;
+        border: 1px solid #CCCCCC;
+        padding:20px;
+        background-image: url('<%=image_path "common/footer.png"%>');
+        background-repeat:no-repeat;
+        background-position :20px 20px;
+    }
+
+    .footer .footer-text{
+        margin-left:140px;
+    }
+
+    .footer .copyright{
+        margin-top:10px;
+        font-size:6pt;
+        color:#AAAAAA;
+    }
+
+    .footer .footer-text a{
+        color:#444;
+    }
+
+    .tooltip{
+        position:absolute;
+        width:260px;
+        height:110px;
+        background-image: url('<%=image_path "common/tooltip.png"%>');
+        z-index:9999;
+    }
+    .tooltip h1{
+        color:#fff;
+        margin-top:30px;
+        margin-left:20px;
+        margin-right:20px;
+        margin-bottom:2px;
+        float:left;
+    }
+    .tooltip p{
+        margin:0px;
+        margin-left:20px;
+        margin-right:20px;
+        color:#fff;
+        font-size:9pt;
+    }
+
+    .tooltip #tooltip-close{
+        margin-top:30px;
+        float:right;
+        color:#C00;
+        font-size:20px;
+        margin-right:10px;
+    }
+</style>

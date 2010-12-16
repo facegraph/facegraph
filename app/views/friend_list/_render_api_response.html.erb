@@ -1,0 +1,9 @@
+<%if relevant_nodes.blank?%>
+    <div class="friend-list-error-message">
+        Sorry, you have no friends with name start with this letter!
+    </div>
+<%else%>
+    <%relevant_nodes.each do |relevant_node|%>
+        <%= render :partial => 'friend_node.html', :locals => {:relevant_node => relevant_node} %>
+    <%end%>
+<%end%>

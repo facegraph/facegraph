@@ -1,0 +1,166 @@
+<style type="text/css">
+    .navigation{
+        color:#fff;
+        background-color: #C00;
+        font-size:1.2em;
+        font-weight:bold;
+        float:right;
+
+        -moz-border-radius: 10px;
+        -webkit-border-radius: 10px;
+        border-radius: 10px;
+    }
+
+    .navigation ul{
+        margin: 0px;
+        padding-right:10px;
+        padding-left:10px;
+    }
+
+    .navigation ul li{
+        float: left;
+        display: inline;
+        padding-left: 20px;
+        padding-right:20px;
+        padding-top: 11px;
+        padding-bottom:10px;
+    }
+
+    .navigation .navigation-hover{
+        position:absolute;
+        ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=40)";
+	filter: alpha(opacity=40);
+        opacity: .4;
+        background-color:#fff;
+        margin-top:8px;
+        height:20px;
+
+        -moz-border-radius: 5px;
+        -webkit-border-radius: 5px;
+        border-radius: 5px;
+    }
+
+    .navigation a{
+        color: #fff;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 8pt;
+
+    }
+</style>
+
+<div class="navigation" id="navigation" >
+  <ul>
+    <li>
+      <a href="#__">CHECKINS</a>
+    </li>
+    <li>
+      <a href="#__" >TAGS</a>
+    </li>
+    <li>
+      <a href="#__" >VISUALIZATION</a>
+    </li>
+  </ul>
+</div>
+
+<div class="tooltip" id="tooltip">
+  <h1 id="tooltip-title" ></h1>
+  <span id="tooltip-close">X</span>
+  <div class="ui-helper-clearfix"></div>
+  <p id="tooltip-description"></p>
+</div>
+
+<script type="text/javascript">
+    var tooltip =   $('#tooltip');
+    var tooltipClose = $('#tooltip-close');
+    var tooltipTitle =   $('#tooltip-title');
+    var tooltipDescription =   $('#tooltip-description');
+    tooltip.hide();
+    tooltipClose.click(function(){
+        tooltip.hide();    
+    });
+
+    function navClicked(e, index){
+        tooltip.css({left:e.offset().left-200 + (e.width()/2)});
+        tooltip.css({top:e.offset().top+30});
+        tooltip.show();
+
+        tooltipTitle.empty();
+        tooltipDescription.empty();
+
+        switch(index){
+            case 0:
+                tooltipTitle.append("CHECKINS");
+                tooltipDescription.append("FaceGraph.ME's checkin aggregates common checkins between friends on Facebook");
+                break;
+            case 1:
+                tooltipTitle.append("TAGS");
+                tooltipDescription.append("[Coming soon] FaceGraph.ME's tag aggregates common wall posts between friends on Facebook");
+                break;
+            case 2:
+                tooltipTitle.append("VISUALIZATION");
+                tooltipDescription.append("[Coming soon] FaceGraph.ME's visualization generates a graph of common friends in real time");
+                break;
+
+        }
+    }
+
+    function navigation(){
+        var navigation = $("#navigation");
+        navigation.prepend('<div class="navigation-hover"></div>');
+        navigation.prepend('<div style="clear:both"></div>');
+        var hover = $(".navigation-hover").eq(0);
+        var current = null;
+        var menuElements = $("#navigation ul li");
+        var firstElement = null;
+        var currentIndex = 0;
+
+        this.initialize = function(){
+            menuElements.each(function(index, val){
+                if (index == 0){firstElement = menuElements.eq(index);}
+
+                var element = menuElements.eq(index);
+
+                element.mouseover(
+                                 function (e) {
+                                     if (current != element){
+                                         current = element;
+                                         currentIndex = index;
+                                         slide(element);
+                                         navClicked(current, currentIndex);
+                                     }
+                                 }
+                        );
+            });
+
+            hover.click(
+                       function(){
+                           window.location=current.children(0)[0].href;
+                       }
+                    );
+
+            hover.mouseout(
+                          function(){
+                              tooltip.hide();
+                          }
+                    );
+        };
+
+        function slide(element){
+            current = element;
+
+            var left = parseInt(current.offset().left);
+            var width = current.width();
+            var padding = parseInt(current.css("padding-left"));
+
+            hover.animate({
+                left: left + (padding/2),
+                width:width + (padding)
+
+            }, 60 );
+        }
+    }
+
+    var nav = new navigation();
+    nav.initialize();
+</script>

@@ -1,0 +1,101 @@
+<script type="text/javascript">
+
+    var visitedCities = {};
+    var totalCities = 0;
+    var totalVenues = 0;
+    var venueCoordinates = [];
+
+    var bounds = new google.maps.LatLngBounds();
+    var infowindow = new google.maps.InfoWindow();
+
+    var map = new google.maps.Map(document.getElementById("map_canvas"),
+    {
+        zoom: 1,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        center: new google.maps.LatLng(0, 0)
+    });
+
+
+    var panorama_map = new google.maps.Map(document.getElementById('panorama_canvas'),
+    {
+        zoom: 16,
+        mapTypeId: google.maps.MapTypeId.ROADMAP,
+        center: new google.maps.LatLng(0, 0)
+    });
+
+    //initialize the dialog
+    $("#panorama_dialog").dialog({ autoOpen: false, closeOnEscape:true, draggable:false, width:700, height:600, modal:true, resizable:false, title:"Venue Street View"});
+
+    function openGraphComplete(api_response, server_response){
+        jQuery.each(server_response.visited_cities, function(key, val) {
+            if(visitedCities[key] != true){
+                if(totalCities > 0){
+                    $('#city_list').append(", ");
+                }
+                else{
+                    $('#city_list').empty();
+                }
+                $('#city_list').append(key);
+                visitedCities[key] = true;
+                totalCities++;
+            }
+        });
+
+        $('#total_cities').empty();
+        $('#total_cities').append(totalCities);
+
+        jQuery.each(server_response.relevant_nodes, function(key, val){
+            var latlng = new google.maps.LatLng(val.place.location.latitude,val.place.location.longitude);
+            var node = val;
+            var marker = new google.maps.Marker({
+                map:map,
+                draggable:true,
+                animation: google.maps.Animation.DROP,
+                position: latlng
+            });
+
+            totalVenues++;
+            bounds.extend(latlng);
+            google.maps.event.addListener(marker, 'click', function() {
+                $('#map_canvas').animate({
+                    height: 400
+                }, 150);
+
+                var address = node.place.location.street + ", " + node.place.location.city + " " + node.place.location.state + ", " + node.place.location.country + " " + node.place.location.zip;
+                var venueName = node.place.name;
+
+                if (map.getZoom()<15){map.setZoom(15)};
+                infowindow.setContent('<h3 style="float:left"><a href="#checkin_' + node.id + '">' + venueName + '</a> <span style="float:left; font-weight:normal;">'+ address + '</span></h3>');
+                infowindow.open(map, marker);
+            });
+        });
+
+        if(server_response.count > 0){
+            map.fitBounds(bounds);
+            $('#total_venues').empty();
+            $('#total_venues').append(totalVenues);
+        }
+    }
+
+    function toggleMap(){
+        $( "#map_canvas" ).toggle( 'blind', {direction: "vertical"}, 700 );
+    }
+
+    function loadPanorama(lat, lng){
+        $("#panorama_dialog").dialog( "open" );
+
+        var latlng = new google.maps.LatLng(lat, lng);
+        panorama_map.setCenter(latlng);
+        var panorama =  panorama_map.getStreetView();
+
+        var panoOptions = {
+            position: latlng,
+            visible: true
+        }
+        panorama.setOptions(panoOptions);
+    }
+
+    function initialize(){
+        openGraph(currentUserId + '/checkins', '#checkin_main_container', {} ,5,0,0,5);
+    }
+</script>

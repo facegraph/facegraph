@@ -1,0 +1,148 @@
+<script type="text/javascript">
+    var timezone = new Date().getTimezoneOffset() / -60;            //timezone
+    var currentUserId = 0;
+
+    /*  OpenGraph wrapper that parses for relevent results in the backend and renders them properly
+     graph fetcher node,
+     container to replace,
+     post processing parameters to backend
+     number of results per api call
+     start depth
+     end depth
+     total relevant results parsed so far in this call
+     */
+    function openGraph(url, container_id, metadata, per_page, start_depth, end_depth, desired_count, recursive_result_count){
+        var offset = 0;
+        var limit = per_page+1;
+
+        if ( end_depth === undefined ) { end_depth = 9;}
+        if ( start_depth === undefined ) { start_depth = 0; }
+        if ( desired_count === undefined ){ desired_count = 0; }
+        if ( recursive_result_count === undefined ) { recursive_result_count = 0; }
+        if (start_depth > 0){
+            offset = (per_page*start_depth)+1;
+            limit = per_page ;
+        }
+
+        if($('#pagination_container').is(':visible')) {
+            $('#pagination_container').hide("blind", {direction: "vertical"}, 500);
+        }
+        $('#pagination_spinner').show()  // hide it initially
+
+        FB.api('/'+url, {offset : offset, limit: limit},
+              function(api_response){
+                  if (api_response.data.length > 0){
+                      $.ajax({
+                          url: "<%=url_for :controller => params[:controller], :action => 'render_api_response', :only_path => false%>",
+                          global: false,
+                          type: "POST",
+                          data: ({
+                              api_response : api_response,
+                              self_id : currentUserId,
+                              friend_id : "<%=params[:id]%>",
+                              timezone : timezone,
+                              timestamp : "" + new Date(),
+                              metadata : metadata
+                          }),
+                          dataType: "json",
+                          async:true,
+                          success: function(server_response, status){
+                              recursive_result_count+=server_response.count;
+
+                              //Search one more level if no relevent result after specified level reached, assuming there are still more data avaliable to the node.
+                              if (recursive_result_count < desired_count && start_depth == end_depth && api_response.data.length > 0){end_depth=end_depth+1;}
+
+                              if (start_depth < end_depth || recursive_result_count == 0){
+                                  openGraph(url, container_id, metadata, per_page, start_depth+1, end_depth, desired_count, recursive_result_count);
+                              }
+
+                              var serverResponseHtmlPartial = jQuery(server_response.html);
+                              $(container_id).append(serverResponseHtmlPartial);
+
+                              if (typeof openGraphComplete == 'function'){ openGraphComplete(api_response, server_response); }
+
+                              if(recursive_result_count >= desired_count)//prevents unnecessary DOM adding and animation clipping after recursion finishes
+                              {
+                                  renderSocialPlugins();
+                                  start_depth = start_depth+1;
+                                  end_depth = end_depth + start_depth;
+                                  $('#pagination').empty();
+                                  $('#pagination').append('<span class="pagination_text"><a href="#paginate" onclick="openGraph(\''+ url +'\',\''+ container_id+'\','+ JSON.stringify(metadata).replace(/"/g, '\'') + ',' + per_page + ','+ start_depth + ',' + end_depth+ ','+ desired_count+');">Search additional entries...</a></span>');
+                                  $('#pagination_container').show("blind", {direction: "vertical"}, 500);
+                                  $('#pagination_spinner').hide();
+                              }
+                          },
+                          error: function(XMLHttpRequest, textStatus, errorThrown){
+                              //console.log('omg');
+                          }
+                      });
+                  }
+                  else{
+                      renderSocialPlugins();
+                      $('#pagination').empty();
+                      $('#pagination').append('<span class="pagination_text">There are not more entries!</span>');
+                      $('#pagination_container').show("blind", {direction: "vertical"}, 500);
+                      $('#pagination_spinner').hide();
+                  }
+              });
+    }
+
+    //need to call this every time we AJAX facebook stuff in
+    function renderSocialPlugins(){
+        FB.XFBML.parse(document.getElementById('main_content'));
+
+    }
+
+    function loginComplete(){
+        loadFacebookEnvironment(true);
+    }
+
+    //Facebook environment loader, with optional login param
+    function loadFacebookEnvironment(login){
+        if ( login === undefined ) { login = false;}
+
+        FB.init({appId: '<%=@facebook_app_id %>', status: true, cookie: true, xfbml: true});
+        FB.getLoginStatus(function(response) {
+            if (response.session) {
+                // logged in and connected user, someone you know
+                currentUserId  = response.session.uid;
+
+                initializeFriendList();
+
+                if (typeof initialize == "function"){ initialize(); }
+
+            <%if Rails.env == "production"%>
+                $.ajax({
+                    url: "<%=@analytics_domain%>/log/",
+                    global: false,
+                    type: "POST",
+                    data: ({
+                        id : response.session.uid,
+                        login: login,
+                        request : "<%=request.url%>",
+                        referer : "<%=request.referer%>"
+                    }),
+                    dataType: "json",
+                    async:true,
+                    success: function(server_response, status){
+
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown){
+
+                    }
+                });
+            <%end%>
+            } else {
+                // no user session available, someone you dont know
+                destructFriendList();
+            }
+        });
+    }
+
+    //Generic URL redirection
+    function facebookNodeUrl(origin_identifier){
+        FB.api('/' + origin_identifier, function(api_response){
+            window.location = api_response.link;
+        });
+    }
+</script>

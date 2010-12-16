@@ -1,0 +1,188 @@
+<script type="text/javascript">
+
+    var friendlist = new friendList();
+
+
+    function friendList(){
+        //state variables
+        var container = $("#friend-list");
+        var friendData = null;
+        var friendCharacter = $("#friend-list-character-displaying");
+        var scroller = $("#friend-scroller");
+        var continueAnimation = false;
+        var currentWidth = 0;
+        var individualWidth = 0;
+        var mouseX = 0;
+        var relevantFriend = null;
+        var currentFriendDataIndex = 0;
+        var currentFriendHoverId = 0;
+        var mouseIn = false;
+
+        var friendPanel = $("#friend-container");
+        var friendSelectorPanel = $("#friend-selector");
+        friendPanel.hide();
+        friendSelectorPanel.hide();
+
+        scroller.mouseout(function(e){
+            continueAnimation = false;
+            mouseIn = false;
+        });
+
+        scroller.mousemove( function(e) {
+            mouseX = e.pageX - scroller.offset().left;
+
+            if(continueAnimation == false  && relevantFriend.length > 0){
+                continueAnimation = true;
+                animatePanel();
+            }
+        });
+
+        scroller.mouseover(function(e){
+            mouseIn = true;
+        });
+
+        scroller.click(function(e){
+            var position = Math.floor((Math.abs(container.position().left) + mouseX -5) / individualWidth);
+            var currentFriendHover = friendlist.friendData[currentFriendDataIndex][position];
+            if (currentFriendHover != undefined){
+                //window.location.href=currentFriendHover.id;
+                var inRestfulURL = "<%=!request.url.index(/\/\d+\/?$/).blank?%>";
+
+                if (inRestfulURL == "true"){
+                    window.location = "<%= request.url.gsub(/\/\d+\/?$/, "")%>/"+ currentFriendHover.id;
+                }
+                else{
+                    window.location = "http://<%= request.domain%><%unless request.port.to_s == "80"%>:<%=request.port%><%end%>/common_checkins/friend/"+ currentFriendHover.id;
+                }
+
+            }
+        });
+
+        function animatePanel(){
+            if(continueAnimation == true){
+                var offset = (Math.abs(mouseX - 720/2));
+                var centerOfGravity = 1;
+                if (offset < 90){
+                    centerOfGravity = 200;
+                }
+                else if (offset <180){
+                    centerOfGravity = 100;
+                }
+                else if (offset <220){
+                    centerOfGravity = 50;
+                }
+                else if (offset >=360){
+                    centerOfGravity = 20;
+                }
+
+                if (mouseX < 720/2){
+                    if (container.position().left < 0){
+                        container.animate({
+                            left: container.position().left + 20
+                        }, {
+                            duration: centerOfGravity,
+                            specialEasing: {
+                                left: 'linear',
+                                height: 'easeOutBounce'
+                            },
+                            complete: function() {
+                                animatePanel();
+                            }
+                        });
+                    }
+                    else{continueAnimation = false;}
+                }
+                else{
+                    if (container.position().left > -1*currentWidth+720-individualWidth){
+                        container.animate({
+                            left: container.position().left - 20
+                        }, {
+                            duration: centerOfGravity,
+                            specialEasing: {
+                                left: 'linear',
+                                height: 'easeOutBounce'
+                            },
+                            complete: function() {
+                                animatePanel();
+                            }
+                        });
+                    }
+                    else{continueAnimation = false;}
+                }
+            }
+        }
+
+
+        this.getFriend = function(letter){
+            currentFriendDataIndex = letter.toLowerCase().charCodeAt(0)-97;
+            relevantFriend = this.friendData[currentFriendDataIndex];
+            container.css("left",0);
+            friendSelectorPanel.slideUp(100);
+
+            friendPanel.slideUp(750, function(){
+                $.ajax({
+                    url: "<%=url_for :controller => "friend_list", :only_path => false%>",
+                    global: false,
+                    type: "POST",
+                    data: ({
+                        api_response : relevantFriend
+                    }),
+                    dataType: "json",
+                    async:true,
+                    success: function(server_response){
+                        friendCharacter.empty();
+                        friendCharacter.append('currently displaying <span class="friend-list-character-displaying-current">' + letter.toUpperCase() + '</span>');
+
+                        friendPanel.slideDown(500, function(){
+                            friendSelectorPanel.slideDown(100);
+                        });
+
+                        container.empty();
+                        container.append(server_response.html);
+
+                        var width = parseInt($("#friend-list :first-child").width());
+                        var marginLeft = parseInt($("#friend-list :first-child").css("margin-left"));
+                        var marginRight = parseInt($("#friend-list :first-child").css("margin-right"));
+                        var paddingLeft = parseInt($("#friend-list :first-child").css("padding-left"));
+                        var paddingRight = parseInt($("#friend-list :first-child").css("padding-right"));
+
+                        individualWidth = width + marginLeft + marginRight + paddingLeft + paddingRight
+                        currentWidth = individualWidth * relevantFriend.length;
+                        container.width(currentWidth);
+
+                        renderFriendList();
+                    }
+                });
+            });
+        }
+    };
+
+    function initializeFriendList(){
+        $("#fb-login-canvas").hide();
+        $('#friend-scroller').show();
+
+        FB.api('/me/friends', function(response){
+            var friend = friendlist;
+            var friendArray = new Array(26);
+            for (i=0; i <26; i++){
+                friendArray[i]=new Array();
+            }
+            jQuery.each(response.data, function(key, val) {
+                friendArray[val.name.toLowerCase().charCodeAt(0) - 97].push(val);
+            });
+            friend.friendData = friendArray;
+            friend.getFriend("a");
+        });
+    }
+
+    function renderFriendList(){
+        FB.XFBML.parse(document.getElementById('friend-wrapper'));
+    }
+
+    function destructFriendList(){
+        $('#friend-scroller').hide();
+        $("#friend-container").slideUp(750);
+        $("#friend-selector").slideUp(50);
+        $("#fb-login-canvas").show();
+    }
+</script>
